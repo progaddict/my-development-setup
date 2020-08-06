@@ -1,0 +1,9 @@
+---
+daifa_installed_versions_directory_path: override-me
+daifa_installed_version_name_prefix: override-me
+daifa_latest_version: override-me
+daifa_download_latest_version_url: override-me
+daifa_extracted_directory_name: override-me
+daifa_system_binary_link_path: override-me
+daifa_binary_subpath: override-me
+daifa_number_of_versions_to_keep: 2

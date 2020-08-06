@@ -1,0 +1,15 @@
+---
+- name: rm older versions
+  become: yes
+  file:
+    path: >-
+      {{ daifa_installed_versions_directory_path }}/{{ daifa_installed_version_name_prefix }}{{ daifa_installed_versions_list[ item | int ] }}
+    state: absent
+  # https://stackoverflow.com/a/44726202/1432357
+  with_sequence: >-
+    start=0
+    count={{ [1,
+      (daifa_installed_versions_list | length) - daifa_number_of_versions_to_keep 
+    ] | max }}
+  when: >-
+    (daifa_installed_versions_list | length) > daifa_number_of_versions_to_keep

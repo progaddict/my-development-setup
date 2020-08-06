@@ -1,0 +1,22 @@
+---
+- name: find installed versions
+  find:
+    paths: >-
+      {{ daifa_installed_versions_directory_path }}
+    patterns: >-
+      {{ daifa_installed_version_name_prefix }}*
+    file_type: directory
+  register: daifa_find_installed_versions_result
+
+- name: extract installed versions
+  set_fact:
+    daifa_installed_versions_list: >-
+      {{ daifa_find_installed_versions_result.files
+      | default([])
+      | sort(attribute='mtime')
+      | map(attribute='path')
+      | map('regex_replace', _regex, '\1', ignorecase=True)
+      | list }}
+  vars:
+    _regex: >-
+      ^.*{{ daifa_installed_version_name_prefix }}(.+)/*$

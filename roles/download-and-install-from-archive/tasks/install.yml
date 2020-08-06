@@ -1,0 +1,63 @@
+---
+- name: create temporary directory for extracting the archive
+  tempfile:
+    state: directory
+  register: daifa_temporary_extraction_directory
+
+- name: download and extract
+  unarchive:
+    src: >-
+      {{ daifa_download_latest_version_url }}
+    dest: >-
+      {{ daifa_temporary_extraction_directory.path }}
+    remote_src: yes
+
+- name: check extracted directory is present (part 1)
+  stat:
+    path: >-
+      {{ daifa_temporary_extraction_directory.path }}/{{ daifa_extracted_directory_name }}
+  register: daifa_extracted_directory_stat
+
+- name: check extracted directory is present (part 2)
+  fail:
+    msg: failed to extract {{ daifa_extracted_directory_name }}
+  when: >-
+    (daifa_extracted_directory_stat.stat is not defined)
+    or
+    (not daifa_extracted_directory_stat.stat.exists)
+    or
+    (not daifa_extracted_directory_stat.stat.isdir)
+    or
+    daifa_extracted_directory_stat.stat.islnk
+
+- name: move firefox directory into installation path
+  become: yes
+  command: >-
+    mv
+    "{{ daifa_extracted_directory_stat.stat.path }}"
+    "{{ daifa_installation_path }}"
+
+- name: remove temporary extraction directory
+  file:
+    path: >-
+      {{ daifa_temporary_extraction_directory.path }}
+    state: absent
+
+- name: change owner to root
+  become: yes
+  file:
+    path: >-
+      {{ daifa_installation_path }}
+    owner: root
+    group: root
+
+- name: link new version
+  become: yes
+  file:
+    path: >-
+      {{ daifa_system_binary_link_path }}
+    owner: root
+    group: root
+    state: link
+    src: >-
+      {{ daifa_installation_path }}/{{ daifa_binary_subpath }}

@@ -1,0 +1,30 @@
+---
+- hosts: localhost
+  tasks:
+    - name: check sudo password is correct
+      become: yes
+      command: echo test
+      changed_when: False
+      tags:
+        - always
+
+    - name: upgrade all packages
+      # noqa 403
+      # reason: I do want to upgrade all packages to the newest versions
+      become: yes
+      dnf:
+        name: >-
+          *
+        state: latest
+      tags:
+        - dnf
+
+    - name: remove packages which are no longer needed
+      become: yes
+      dnf:
+        autoremove: yes
+      tags:
+        - dnf
+
+    - import_role:
+        name: firefox-developer-edition

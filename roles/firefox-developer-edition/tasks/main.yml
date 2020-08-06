@@ -1,0 +1,28 @@
+---
+- import_tasks: get-latest-version.yml
+
+- import_role:
+    name: download-and-install-from-archive
+  vars:
+    daifa_installed_versions_directory_path: >-
+      {{ fde_installed_versions_directory_path }}
+    daifa_installed_version_name_prefix: >-
+      firefox-developer-edition-
+    daifa_latest_version: >-
+      {{ fde_latest_version }}
+    daifa_download_latest_version_url: >-
+      {{ fde_download_latest_version_url }}
+    daifa_extracted_directory_name: >-
+      firefox
+    daifa_system_binary_link_path: >-
+      {{ fde_system_binary_link_path }}
+    daifa_binary_subpath: >-
+      firefox
+
+- name: add desktop entry
+  template:
+    src: firefox-developer-edition.desktop.j2
+    dest: >-
+      {{ lookup('env','HOME') }}/.local/share/applications/firefox-developer-edition.desktop
+    mode: >-
+      0644

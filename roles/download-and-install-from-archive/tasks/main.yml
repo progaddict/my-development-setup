@@ -1,0 +1,30 @@
+---
+- name: ensure {{ daifa_installed_versions_directory_path }} exists
+  become: yes
+  file:
+    path: >-
+      {{ daifa_installed_versions_directory_path }}
+    state: directory
+    owner: root
+    group: root
+
+- import_tasks: get-installed-versions.yml
+
+- name: compose installation directory
+  set_fact:
+    daifa_installation_path: >-
+      {{ daifa_installed_versions_directory_path }}/{{ daifa_installed_version_name_prefix }}{{ daifa_latest_version }}
+
+- import_tasks: install.yml
+  when: >-
+    daifa_latest_version
+    not in
+    daifa_installed_versions_list
+
+- import_tasks: get-installed-versions.yml
+
+- import_tasks: rm-old-versions.yml
+  when: >-
+    (daifa_number_of_versions_to_keep > 0)
+    and
+    (daifa_installed_versions_list | length > daifa_number_of_versions_to_keep)

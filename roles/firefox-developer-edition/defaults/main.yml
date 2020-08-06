@@ -1,0 +1,4 @@
+---
+fde_get_latest_version_url: https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US
+fde_installed_versions_directory_path: /opt/mozilla
+fde_system_binary_link_path: /usr/bin/firefox-developer-edition

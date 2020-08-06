@@ -1,0 +1,33 @@
+---
+- name: get location header
+  uri:
+    url: >-
+      {{ fde_get_latest_version_url }}
+    method: HEAD
+    status_code: 302
+    follow_redirects: none
+  register: fde_http_response
+
+- name: check location header
+  fail:
+    msg: could not find location header
+  when: >-
+    (fde_http_response is not defined)
+    or
+    (fde_http_response.location is not defined)
+    or
+    (fde_http_response.location | length <= 0)
+
+- name: extract location header
+  set_fact:
+    fde_download_latest_version_url: >-
+      {{ fde_http_response.location }}
+
+- name: extract version
+  set_fact:
+    fde_latest_version: >-
+      {{ fde_download_latest_version_url
+          | regex_replace(_regex, '\1', ignorecase=True) }}
+  vars:
+    _regex: >-
+      ^.*/pub/devedition/releases/(.+)/linux-x86_64/en-US/.*$
